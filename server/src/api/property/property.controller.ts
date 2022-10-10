@@ -5,7 +5,6 @@ import validate from '@/api/property/property.validation';
 import PropertyService from '@/api/property/property.service';
 import Property from '@/api/property/property.model';
 import HttpException from '@/utils/exceptions/http.exception';
-import authenticated from '@/middleware/authenticated.middleware';
 import isAuthorized from '@/middleware/authorised.middleware';
 
 class PropertyController implements Controller {

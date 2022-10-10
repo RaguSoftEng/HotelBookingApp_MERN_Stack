@@ -5,7 +5,6 @@ import validate from '@/api/room/room.validation';
 import RoomService from '@/api/room/room.service';
 import Room from '@/api/room/room.model';
 import HttpException from '@/utils/exceptions/http.exception';
-import authenticated from '@/middleware/authenticated.middleware';
 import isAuthorized from '@/middleware/authorised.middleware';
 
 class RoomController implements Controller {
