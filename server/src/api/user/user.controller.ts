@@ -6,6 +6,7 @@ import UserService from '@/api/user/user.service';
 import User from '@/api/user/user.model';
 import HttpException from '@/utils/exceptions/http.exception';
 import authenticated from '@/middleware/authenticated.middleware';
+import token from '@/utils/token';
 
 class UserController implements Controller {
 	public path = '/users';
@@ -43,7 +44,17 @@ class UserController implements Controller {
 			});
 
 			const response = await this.userService.create(user);
-			res.status(200).json({ response });
+			const jwt_token = token.createToken(response);
+
+			res.status(200).json({
+				response: {
+					id: user._id,
+					fullname: user.fullname,
+					email: user.email,
+					isAdmin: user.isAdmin,
+					token: jwt_token
+				}
+			});
 		} catch (error) {
 			next(new HttpException(400, error.message));
 		}
@@ -56,9 +67,19 @@ class UserController implements Controller {
 	): Promise<Response | void> => {
 		try {
 			const { email, password } = req.body;
-			const jwt_token = await this.userService.login(email, password);
+			const user = await this.userService.login(email, password);
 
-			res.status(200).json({ response: { jwt_token } });
+			const jwt_token = token.createToken(user);
+
+			res.status(200).json({
+				response: {
+					id: user._id,
+					fullname: user.fullname,
+					email: user.email,
+					isAdmin: user.isAdmin,
+					token: jwt_token
+				}
+			});
 		} catch (error) {
 			next(new HttpException(400, error.message));
 		}

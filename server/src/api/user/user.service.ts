@@ -1,5 +1,5 @@
 import UserModel from '@/api/user/user.model';
-import token from '@/utils/token';
+
 import { Schema } from 'mongoose';
 import IUser from '@/api/user/user.interface';
 
@@ -21,7 +21,7 @@ class UserService {
 	/**
 	 * User Login
 	 */
-	public async login(email: string, password: string): Promise<Error | string> {
+	public async login(email: string, password: string): Promise<IUser> {
 		try {
 			const user_res = await this.user.findOne({ email });
 
@@ -35,7 +35,7 @@ class UserService {
 				throw new Error('Invalid user.');
 			}
 
-			return token.createToken(user_res);
+			return user_res;
 		} catch (error) {
 			throw new Error('Unable to login user');
 		}

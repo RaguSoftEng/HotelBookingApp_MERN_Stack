@@ -40,6 +40,19 @@ class RoomService {
 		}
 	}
 
+	public async getAllRooms(): Promise<Error | IRoom[]> {
+		try {
+			return await this.roomschema
+				.find({})
+				.populate('property', 'name description city address contactNo rates')
+				.populate('createdBy', 'fullname email contactNo')
+				.populate('updatedBy', 'fullname email contactNo')
+				.exec();
+		} catch (error) {
+			throw error;
+		}
+	}
+
 	public async getRoomAvailablitiy(filter: any): Promise<boolean> {
 		try {
 			const bookings = await this.reserveschema.find({
@@ -113,7 +126,7 @@ class RoomService {
 					$nin: ids
 				},
 				property: filter.id
-			});
+			}).populate('property', 'name description city address contactNo rates').exec();
 
 			return rooms;
 		} catch (error) {

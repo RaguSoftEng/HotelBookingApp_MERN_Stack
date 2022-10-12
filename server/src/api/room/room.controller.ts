@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Controller from '@/utils/interfaces/controller.interface';
-import validationMiddleware from '@/middleware/validation.middleware';
+import validationMiddleware, {validateQueryParams} from '@/middleware/validation.middleware';
 import validate from '@/api/room/room.validation';
 import RoomService from '@/api/room/room.service';
 import Room from '@/api/room/room.model';
@@ -29,6 +29,7 @@ class RoomController implements Controller {
 			validationMiddleware(validate.update),
 			this.update
 		);
+		this.router.get(`/rooms`, this.getAllRooms);
 		this.router.get(`${this.path}`, this.getAll);
 		this.router.get(`${this.path}/:roomid`, this.get);
 		this.router.get(
@@ -39,7 +40,7 @@ class RoomController implements Controller {
 
 		this.router.get(
 			`/properties/:propertyid/availabilities`,
-			validationMiddleware(validate.availability),
+			validateQueryParams(validate.availability),
 			this.getAllAvailableRooms
 		);
 	}
@@ -123,6 +124,19 @@ class RoomController implements Controller {
 		}
 	};
 
+	private getAllRooms = async (
+		req: Request,
+		res: Response,
+		next: NextFunction
+	): Promise<Response | void> => {
+		try {
+			const response = await this.roomService.getAllRooms();
+			res.status(200).json({ response });
+		} catch (error) {
+			next(new HttpException(400, error.message));
+		}
+	};
+
 	private getRoomAvailability = async (
 		req: Request,
 		res: Response,
@@ -152,8 +166,8 @@ class RoomController implements Controller {
 		try {
 			const response = await this.roomService.getAvailabilities({
 				id: req.params.propertyid,
-				checkinAt: req.body.checkinAt,
-				checkoutAt: req.body.checkoutAt
+				checkinAt: req.query.checkinAt,
+				checkoutAt: req.query.checkoutAt
 			});
 			res.status(200).json({ response });
 		} catch (error) {
